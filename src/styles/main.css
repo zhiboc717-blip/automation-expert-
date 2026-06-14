@@ -1,0 +1,191 @@
+/**
+ * Tailwind CSS v4 入口 + 自定义工业风 Dark Mode 主题变量
+ *
+ * 使用 @import "tailwindcss" 引入 Tailwind CSS v4
+ * 通过 @theme 自定义颜色、字体等设计令牌
+ */
+
+@import "tailwindcss";
+
+/* ===== 工业风 Dark Mode 主题色板 ===== */
+@theme {
+  /* 主背景与表面 */
+  --color-bg-primary: #0a0e17;
+  --color-bg-card: #111827;
+  --color-bg-card-hover: #1a2332;
+  --color-bg-input: #0d1321;
+
+  /* 边框 */
+  --color-border-default: #1f2937;
+  --color-border-focus: #3b82f6;
+  --color-border-success: #00FF00;
+  --color-border-warning: #FFD700;
+
+  /* 文字 */
+  --color-text-primary: #e5e7eb;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted: #4b5563;
+
+  /* 功能色 */
+  --color-accent-green: #00FF00;      /* 荧光绿 — 计算结果高亮 */
+  --color-accent-yellow: #FFD700;     /* 警示黄 — 重要提示 */
+  --color-accent-blue: #3b82f6;       /* 强调蓝 — 链接/按钮 */
+  --color-accent-red: #ef4444;        /* 错误红 */
+
+  /* 字体 */
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+  --font-sans: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", system-ui, -apple-system, sans-serif;
+}
+
+/* ===== 全局基础样式 ===== */
+html, body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* ===== 滚动条美化（深色风格）===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-default);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-muted);
+}
+
+/* ===== 数字输入框样式统一 ===== */
+input[type="number"],
+input[type="text"] {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  border-color: var(--color-border-focus);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+
+/* 移除数字输入框的上下箭头 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox 下隐藏数字箭头 */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ===== 选择框统一样式 ===== */
+select {
+  background-color: var(--color-bg-input);
+  border: 1px solid var(--color-border-default);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  padding: 10px 32px 10px 12px;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2'%3E%3Cpolyline points='6,9 12,15 18,9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+select:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* ===== 按钮基础动画 ===== */
+.btn-glow:hover {
+  box-shadow: 0 0 16px rgba(0, 255, 0, 0.25);
+}
+
+/* ===== 卡片通用样式 ===== */
+.card-panel {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border-default);
+  border-radius: 12px;
+  padding: 20px;
+  transition: border-color 0.2s ease;
+}
+
+.card-panel:hover {
+  border-color: #374151;
+}
+
+/* ===== 结果荧光效果 ===== */
+.result-glow {
+  color: var(--color-accent-green);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.3), 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+/* ===== 打印时隐藏非必要元素 ===== */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+/* ===== 动画关键帧 ===== */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out forwards;
+}
+
+/* ===== Modal 背景遮罩 ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
