@@ -11,6 +11,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      base: '/automation-expert-/',
       includeAssets: ['favicon.svg', 'icons/*.svg'],
       manifest: {
         name: '自动化调试专家',

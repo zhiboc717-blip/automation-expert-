@@ -16,16 +16,24 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 const isOfflineMode = !supabaseUrl || !supabaseAnonKey
 
 let client = null
+let _clientInitPromise = null
 
-// 延迟导入 Supabase 客户端（避免在离线模式下报错）
-if (!isOfflineMode) {
-  try {
-    const { createClient } = await import('@supabase/supabase-js')
-    client = createClient(supabaseUrl, supabaseAnonKey)
-  } catch (error) {
-    console.warn('[Supabase] 初始化失败，进入离线模式:', error.message)
-    client = null
+/**
+ * 懒初始化 Supabase 客户端（避免在离线模式下报错 + 兼容旧浏览器无顶层await）
+ */
+function initClient() {
+  if (_clientInitPromise) return _clientInitPromise
+  if (!isOfflineMode) {
+    _clientInitPromise = import('@supabase/supabase-js').then(({ createClient }) => {
+      client = createClient(supabaseUrl, supabaseAnonKey)
+      return client
+    }).catch((error) => {
+      console.warn('[Supabase] 初始化失败，进入离线模式:', error.message)
+      client = null
+      return null
+    })
   }
+  return Promise.resolve(null)
 }
 
 /** 当前登录用户信息 */
@@ -56,11 +64,16 @@ export function useSupabase() {
    * 邮箱+密码登录
    */
   async function signIn(email, password) {
-    if (isOfflineMode || !client) {
+    if (isOfflineMode) {
       return { success: false, error: '当前为离线模式，请先在 .env 文件中配置 Supabase 凭据' }
     }
 
     try {
+      await initClient()
+      if (!client) {
+        return { success: false, error: 'Supabase 客户端初始化失败' }
+      }
+
       isLoading.value = true
       const { data, error } = await client.auth.signInWithPassword({ email, password })
 
@@ -93,9 +106,11 @@ export function useSupabase() {
    * 获取当前已认证的用户信息
    */
   async function getUser() {
-    if (isOfflineMode || !client) return null
+    if (isOfflineMode) return null
 
     try {
+      await initClient()
+      if (!client) return null
       const { data: { user } } = await client.auth.getUser()
       currentUser.value = user
       return user
@@ -109,7 +124,7 @@ export function useSupabase() {
    * @param {Object} record - 记录数据，包含 moduleName, inputs, outputs, note 等
    */
   async function saveCalcHistory(record) {
-    if (isOfflineMode || !client) {
+    if (isOfflineMode) {
       return {
         success: false,
         error: '离线模式 — 已自动保存到本地 IndexedDB',
@@ -118,6 +133,11 @@ export function useSupabase() {
     }
 
     try {
+      await initClient()
+      if (!client) {
+        return { success: false, error: '离线模式 — 已自动保存到本地 IndexedDB', data: record }
+      }
+
       const { data, error } = await client.from('calc_history').insert({
         user_id: currentUser.value?.id,
         module_name: record.moduleName,
@@ -143,11 +163,14 @@ export function useSupabase() {
    * @returns {Array<Object>} 历史记录数组
    */
   async function getCalcHistory(limit = 50) {
-    if (isOfflineMode || !client) {
+    if (isOfflineMode) {
       return []
     }
 
     try {
+      await initClient()
+      if (!client) return []
+
       const userId = currentUser.value?.id
       let query = client
         .from('calc_history')

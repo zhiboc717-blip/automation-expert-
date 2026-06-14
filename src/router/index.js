@@ -32,7 +32,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env.BASE_URL || '/'),
   routes,
   // 页面切换时滚动到顶部
   scrollBehavior() {
